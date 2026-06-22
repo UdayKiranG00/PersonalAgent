@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@google/genai": "^2.8.0"
+    "@google/genai": "^2.8.0",
+    "prettier": "^3.8.4"
   }
 }

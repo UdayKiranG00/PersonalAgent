@@ -1,0 +1,8 @@
+{
+"command": "gws calendar +agenda --days {n}",
+"description": "List your events from your calendar over the next n number of days, {n} place holder for number of days."
+},
+{
+"command": "gws calendar +insert --summary "{event_name}" --start "{startdateandtime}" --end "enddateandtime"",
+"description": "quick-add an event to calendar,event_name is name of event, startdatetime and enddatetime format YYYY-MM-DDTHH:MM:SSZ, {} indicates place holder."
+}
