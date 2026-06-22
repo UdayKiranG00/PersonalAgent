@@ -23,21 +23,7 @@ async function executeTool(fnObj) {
   const toolName = fnObj.name;
   output.write(toolName);
   let cmd = "";
-  if (toolName === "quick_add_event") {
-    let calName = fnObj.args.calendar_name;
-    let date = fnObj.args.date;
-    let time = fnObj.args.time;
-    let eventName = fnObj.args.event_name;
-    //output.write(calName + date+time+eventName);
-    cmd = `gcalcli --calendar ${calName} quick "${date} ${time} ${eventName}"`;
-    toolResponse = await executeCmd(cmd);
-    if (toolResponse.trim() === "") {
-      toolResponse = "event added successfully to calendar.";
-    }
-  } else if (toolName === "list_agenda_7_days") {
-    cmd = `gcalcli agenda`;
-    toolResponse = await executeCmd(cmd);
-  } else if (toolName === "execute_commands") {
+  if (toolName === "execute_commands") {
     let command = fnObj.args.command;
     output.write(command);
     cmd = command + " >output.txt";

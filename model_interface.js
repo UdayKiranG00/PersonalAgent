@@ -34,13 +34,13 @@ async function chatSummariser(query) {
    The function data may vary in format (e.g., text, JSON, tables).
    For all interaction turns, analyze the data carefully and output a clear, concise, step-by-step summary
    detailing:User Intent: The goal of the user's query.
-   Action Carried Out: The specific operations performed or data retrieved by the function response.
+   Action Carried Out: The result of specific operations performed or data retrieved by the function.
    Ensure the output is highly structured so that another LLM can easily interpret the sequential context.
    Here is the chat history: ${query}`;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash", //,"gemini-2.5-flash"
+      model: "gemma-4-31b-it", //,"gemini-2.5-flash"
       contents: prompt,
     });
 
