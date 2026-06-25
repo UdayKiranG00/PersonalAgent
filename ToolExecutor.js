@@ -18,22 +18,36 @@ async function executeCmd(cmd) {
   return cmdResponse;
 }
 
-async function executeTool(fnObj) {
+async function executeTool(toolCall) {
   let toolResponse = "";
-  const toolName = fnObj.name;
-  output.write(toolName);
   let cmd = "";
-  if (toolName === "execute_commands") {
-    let command = fnObj.args.command;
-    output.write(command);
-    cmd = command + " >output.txt";
-    toolResponse = await executeCmd(cmd);
-    toolResponse = await executeCmd("type output.txt");
+  const { name, args } = toolCall;
+  output.write("tool name: " + name);
+  if (name === "execute_commands") {
+    cmd = args.command;
+  } else if (name === "read_message_details") {
+    cmd = `gws gmail users messages get --params "{\\"userId\\": \\"me\\", \\"id\\": \\"${args.id}\\"}"`;
+  } else if (name === "list_unread_messages") {
+    const params = `{ \\"userId\\": \\"${args.userId}\\", \\"q\\": \\"${args.q}\\", \\"maxResults\\": \\"${args.maxResults}\\" }`;
+    //command to list unread messages: gws gmail users messages list --params "{\"userId\": \"me\", \"q\": \"is:unread\", \"maxResults\": \"2\", \"pageToken\": \"18101350643833213025\"}"
+    cmd = `gws gmail users messages list --params "${params}"`;
+  } else if (name === "sendMails") {
+    let mailStr = "";
+    let len = args.mailList.length - 1;
+    for (let i = 0; i < len; i++) {
+      mailStr = mailStr + args.mailList[i] + ",";
+    }
+    mailStr = mailStr + args.mailList[len];
+    cmd = `gws gmail +send --to ${mailStr} --subject "${args.subject}" --body "${args.body}"`;
+  } else if (name === "trash_gmail_message") {
+    cmd = `gws gmail users messages trash --params "{\\"userId\\":\\"me\\",\\"id\\":\\"${args.id}\\"}"`;
   }
-
-  console.log(toolResponse);
+  output.write("tool command: " + cmd);
+  cmd = cmd + " >output.txt";
+  await executeCmd(cmd);
+  toolResponse = await executeCmd("type output.txt");
+  //console.log(toolResponse);
   return toolResponse;
 }
 
-//executeTool({});
 export { executeTool };

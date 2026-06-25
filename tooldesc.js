@@ -1,73 +1,87 @@
-const calendarToolDeclaration = {
+const gmailToolDeclaration = {
   functionDeclarations: [
     {
-      name: "list_agenda_7_days",
+      name: "sendMails",
+      description: "Sends emails to multiple users.",
+      parameters: {
+        type: "object",
+        properties: {
+          mailList: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            description: "An array of recipients mails.",
+          },
+          subject: {
+            type: "string",
+            description: "Subject of the mail.",
+          },
+          body: {
+            type: "string",
+            description: "Body of the mail",
+          },
+        },
+        required: ["mailList", "subject", "body"],
+      },
+    },
+    {
+      name: "list_unread_messages",
       description:
-        "List your events for all your calendars over the next 7 days.",
-      parameters: {
-        type: "object",
-        properties: {},
-        required: [],
-      },
-    },
-    {
-      name: "list_calendar_agenda",
-      description: "List events from a specific calendar.",
+        "Lists unread Gmail messages for the authenticated user matching optional search filters.",
       parameters: {
         type: "object",
         properties: {
-          calendar_name: {
+          userId: {
             type: "string",
             description:
-              "The name of the specific calendar is always udayganguru2000@gmail.com.",
+              "The user's email address. The special value 'me' indicates the authenticated user.",
+            default: "me",
+          },
+          q: {
+            type: "string",
+            description:
+              "Optional search query to refine unread messages (e.g., 'from:boss@company.com').",
+            default: "is:unread",
+          },
+          maxResults: {
+            type: "integer",
+            description: "maximum number of unread gmail messages to retrieve.",
+            default: 10,
           },
         },
-        required: ["calendar_name"],
+        required: ["userId", "q", "maxResults"],
       },
     },
     {
-      name: "display_weekly_calendar",
-      description: "Display an ASCII calendar of events by week.",
-      parameters: {
-        type: "object",
-        properties: {},
-        required: [],
-      },
-    },
-    {
-      name: "display_monthly_calendar",
-      description: "Display an ASCII calendar of events for a month.",
-      parameters: {
-        type: "object",
-        properties: {},
-        required: [],
-      },
-    },
-    {
-      name: "quick_add_event",
-      description: "Quick-add an event to a specified calendar.",
+      name: "read_message_details",
+      description:
+        "Retrieves the sender, subject, body, and headers of a specific Gmail message by its messageID.",
       parameters: {
         type: "object",
         properties: {
-          calendar_name: {
+          id: {
             type: "string",
-            description:
-              "The name of the calendar is always udayganguru2000@gmail.com",
-          },
-          date: {
-            type: "string",
-            description: "The date of the event in mm/dd format.",
-          },
-          time: {
-            type: "string",
-            description: "The time of the event in HH:MM format.",
-          },
-          event_name: {
-            type: "string",
-            description: "The title/name of the event.",
+            description: "The unique immutable ID of the message to retrieve.",
           },
         },
-        required: ["calendar_name", "date", "time", "event_name"],
+        required: ["id"],
+      },
+    },
+    {
+      name: "trash_gmail_message",
+      description:
+        "Moves a specific Gmail message to the trash folder using its message ID.",
+      parameters: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            description:
+              "The unique alphanumeric ID of the Gmail message to trash.",
+          },
+        },
+        required: ["id"],
       },
     },
   ],
@@ -93,4 +107,4 @@ const commandToolDeclaration = {
   ],
 };
 
-export { calendarToolDeclaration, commandToolDeclaration };
+export { gmailToolDeclaration, commandToolDeclaration };

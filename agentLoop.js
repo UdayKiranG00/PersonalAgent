@@ -16,7 +16,6 @@ async function main() {
     //input
     let userQuery = await rl.question("You> ");
     userQuery = "User Query: " + userQuery;
-
     msgHistory.push(userQuery);
 
     if (shouldExit(userQuery)) break;
@@ -24,22 +23,23 @@ async function main() {
     let modelResponse = await generateResponse(userQuery);
 
     while (modelResponse.functionCalls?.length > 0) {
-      output.write(`modelrestext> ${modelResponse.text}`);
       for (let i = 0; i < modelResponse.functionCalls.length; i++) {
         msgHistory.push(
-          "function Call: " + modelResponse.functionCalls[i].name,
+          "Tool Call: " + modelResponse.functionCalls[i].name,
         );
         let toolResponse = await executeTool(modelResponse.functionCalls[i]);
-        toolResponse = "function Response: " + toolResponse;
-        output.write(`msgHistory> ${toolResponse.toString()}`);
-        msgHistory.push(toolResponse.toString());
+        toolResponse = "Tool Response: " + toolResponse;
+        output.write(`tool response: ${toolResponse}\n`);
+        msgHistory.push(toolResponse);
       }
+      output.write(`message history: ${msgHistory.toString()}`);
       modelResponse = await generateResponse(msgHistory.toString());
       let chatSummary = await chatSummariser(msgHistory.toString());
+      output.write(`chat summary: ${chatSummary.text}`);
       msgHistory = [chatSummary.text];
     }
-    output.write(`msgHistory> ${msgHistory.toString()}`);
-    output.write(`finaloutput> ${modelResponse.text}\n\n`);
+    output.write(`message history: ${msgHistory}`);
+    output.write(`final model output: ${modelResponse.text}\n\n`);
     msgHistory.push(modelResponse.text);
   }
 
