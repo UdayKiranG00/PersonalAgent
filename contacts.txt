@@ -1,0 +1,5 @@
+{"name":"Pavan Ganguru","mailAddress":"pavanganguru8@gmail.com"}
+{"name":"Uday","mailAddress":"udayganguru2000@gmail.com"} 
+{"name":"Temu","mailAddress":"email@news.temuemail.com"} 
+{"name":"Udayganguru","mailAddress":"udayganguru000@gmail.com"} 
+{"name":"Uganguru","mailAddress":"uganguru@my.bridgeport.edu"} 

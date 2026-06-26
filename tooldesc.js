@@ -19,14 +19,14 @@ const gmailToolDeclaration = {
           },
           body: {
             type: "string",
-            description: "Body of the mail",
+            description: "Body of the mail, only html format, even newlines expects <br>",
           },
         },
         required: ["mailList", "subject", "body"],
       },
     },
     {
-      name: "list_unread_messages",
+      name: "lists_messages",
       description:
         "Lists unread Gmail messages for the authenticated user matching optional search filters.",
       parameters: {
@@ -44,13 +44,8 @@ const gmailToolDeclaration = {
               "Optional search query to refine unread messages (e.g., 'from:boss@company.com').",
             default: "is:unread",
           },
-          maxResults: {
-            type: "integer",
-            description: "maximum number of unread gmail messages to retrieve.",
-            default: 10,
-          },
         },
-        required: ["userId", "q", "maxResults"],
+        required: ["userId", "q"],
       },
     },
     {
@@ -84,6 +79,45 @@ const gmailToolDeclaration = {
         required: ["id"],
       },
     },
+    {
+      name: "trash_automation",
+      description:
+        "To initiate a process that deletes unwanted/unuseful mails.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
+      name: "read_contacts_list",
+      description:
+        "gets a list of contacts with name and mail address.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
+      name: "save_contact",
+      description:
+        "saves a new contact with name and email address.",
+      parameters: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            description: "name of contact, can be firstname from mail address",
+          },
+          mailAddress: {
+            type: "string",
+            description: "mail address of the contact.",
+          },
+        },
+        required: ["name", "mailAddress"],
+      },
+    },
   ],
 };
 
@@ -92,7 +126,7 @@ const commandToolDeclaration = {
     {
       name: "execute_commands",
       description:
-        "execute any command in the windows command prompt like create folders/file, read/write files etc.. in current folder.",
+        "execute any command in the windows command prompt like create folders/file, read/write files etc.. in current directory as root.",
       parameters: {
         type: "object",
         properties: {
@@ -107,4 +141,24 @@ const commandToolDeclaration = {
   ],
 };
 
-export { gmailToolDeclaration, commandToolDeclaration };
+const categoryToolDeclaration = {
+  functionDeclarations: [
+    {
+      name: "save_category",
+      description:
+        "saves the category of the mail",
+      parameters: {
+        type: "object",
+        properties: {
+          category: {
+            type: "string",
+            description: "category of mail, expects one of 'Promotional','Rejection','Other'.",
+          },
+        },
+        required: ["category"],
+      },
+    },
+  ],
+};
+
+export { gmailToolDeclaration, commandToolDeclaration, categoryToolDeclaration };
