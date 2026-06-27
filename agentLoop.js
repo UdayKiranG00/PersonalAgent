@@ -1,8 +1,12 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import { executeTool } from "./ToolExecutor.js";
-import { generateResponse, summariserPrompt, gmailPrompt } from "./model_interface.js";
-import { gmailToolDeclaration ,commandToolDeclaration} from "./tooldesc.js";
+import { executeTool, scratchPad } from "./ToolExecutor.js";
+import {
+  generateResponse,
+  summariserPrompt,
+  gmailPrompt,
+} from "./model_interface.js";
+import { gmailToolDeclaration, commandToolDeclaration, planningToolDeclaration } from "./tooldesc.js";
 
 const EXIT = new Set(["/exit", "/quit", "exit", "quit"]);
 function shouldExit(line) {
@@ -11,7 +15,7 @@ function shouldExit(line) {
 
 async function main() {
   const rl = createInterface({ input, output });
-  let toolDeclarations = [gmailToolDeclaration,commandToolDeclaration];
+  let toolDeclarations = [gmailToolDeclaration, commandToolDeclaration, planningToolDeclaration];
   let msgHistory = [];
   while (true) {
     //input
@@ -21,7 +25,11 @@ async function main() {
 
     if (shouldExit(userQuery)) break;
     console.log(msgHistory.toString());
-    let modelResponse = await generateResponse(msgHistory.toString(),gmailPrompt,toolDeclarations);
+    let modelResponse = await generateResponse(
+      msgHistory.toString(),
+      gmailPrompt,
+      toolDeclarations,
+    );
 
     while (modelResponse.functionCalls?.length > 0) {
       for (let i = 0; i < modelResponse.functionCalls.length; i++) {
@@ -31,11 +39,20 @@ async function main() {
         output.write(`tool response: ${toolResponse}\n`);
         msgHistory.push(toolResponse);
       }
-      modelResponse = await generateResponse(msgHistory.toString(),gmailPrompt,toolDeclarations);
+      modelResponse = await generateResponse(
+        scratchPad.content+msgHistory.toString(),
+        gmailPrompt,
+        toolDeclarations,
+      );
+      output.write(`\nscratch pad: ${scratchPad.content}`);
     }
     output.write(`final model output: ${modelResponse.text}\n\n`);
     msgHistory.push(modelResponse.text);
-    let chatSummary = await generateResponse(msgHistory.toString(),summariserPrompt,[]);
+    let chatSummary = await generateResponse(
+      msgHistory.toString(),
+      summariserPrompt,
+      [],
+    );
     output.write(`chat summary: ${chatSummary.text}`);
     msgHistory = [chatSummary.text];
   }

@@ -1,7 +1,7 @@
 const gmailToolDeclaration = {
   functionDeclarations: [
     {
-      name: "sendMails",
+      name: "send_mails",
       description: "Sends emails to multiple users.",
       parameters: {
         type: "object",
@@ -19,7 +19,8 @@ const gmailToolDeclaration = {
           },
           body: {
             type: "string",
-            description: "Body of the mail, only html format, even newlines expects <br>",
+            description:
+              "Body of the mail, only html format, even newlines expects <br>",
           },
         },
         required: ["mailList", "subject", "body"],
@@ -91,8 +92,7 @@ const gmailToolDeclaration = {
     },
     {
       name: "read_contacts_list",
-      description:
-        "gets a list of contacts with name and mail address.",
+      description: "gets a list of contacts with name and mail address.",
       parameters: {
         type: "object",
         properties: {},
@@ -101,8 +101,7 @@ const gmailToolDeclaration = {
     },
     {
       name: "save_contact",
-      description:
-        "saves a new contact with name and email address.",
+      description: "saves a new contact with name and email address.",
       parameters: {
         type: "object",
         properties: {
@@ -145,14 +144,14 @@ const categoryToolDeclaration = {
   functionDeclarations: [
     {
       name: "save_category",
-      description:
-        "saves the category of the mail",
+      description: "saves the category of the mail",
       parameters: {
         type: "object",
         properties: {
           category: {
             type: "string",
-            description: "category of mail, expects one of 'Promotional','Rejection','Other'.",
+            description:
+              "category of mail, expects one of 'Promotional','Rejection','Other'.",
           },
         },
         required: ["category"],
@@ -161,4 +160,89 @@ const categoryToolDeclaration = {
   ],
 };
 
-export { gmailToolDeclaration, commandToolDeclaration, categoryToolDeclaration };
+const planningToolDeclaration = {
+functionDeclarations: [
+{
+  "name": "save_scratchpad",
+  "description": "Overwrites the current scratchpad content with a new set of thoughts, approach ideas, or reasoning steps.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "content": {
+        "type": "string",
+        "description": "The full text content representing the LLM's current internal thoughts, strategies, and notes."
+      }
+    },
+    "required": ["content"]
+  },
+},
+{
+  "name": "append_task",
+  "description": "Appends a new task to the task management system with a specified description and status.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier for the task."
+      },
+      "task_description": {
+        "type": "string",
+        "description": "The detailed description of the work to be done."
+      },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "done", "cancelled", "failed"],
+        "description": "The current state of the task."
+      }
+    },
+    "required": ["id", "task_description", "status"]
+  },
+},
+{
+    "name": "update_task",
+    "description": "Updates the details or status of an existing task in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the task to update."
+        },
+        "task_description": {
+          "type": "string",
+          "description": "The updated description of the task."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "done", "cancelled", "failed"],
+          "description": "The updated state of the task."
+        }
+      },
+      "required": ["id"]
+    },
+  },
+{
+    "name": "read_tasks",
+    "description": "Retrieves a list of tasks items, optionally filtered by their current status.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "done", "cancelled", "failed"],
+          "description": "Filter tasks by this specific state."
+        }
+      },
+      "required": []
+    },
+  },
+],
+}
+
+export {
+  gmailToolDeclaration,
+  commandToolDeclaration,
+  categoryToolDeclaration,
+  planningToolDeclaration
+};
