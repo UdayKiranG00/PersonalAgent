@@ -3,3 +3,4 @@
 {"name":"Temu","mailAddress":"email@news.temuemail.com"} 
 {"name":"Udayganguru","mailAddress":"udayganguru000@gmail.com"} 
 {"name":"Uganguru","mailAddress":"uganguru@my.bridgeport.edu"} 
+{"name":"RemoteHunter","mailAddress":"notifications@mail.remotehunter.com"} 

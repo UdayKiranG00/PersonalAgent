@@ -3,7 +3,7 @@ import dns from 'node:dns'; // use import dns from 'node:dns'; if using ES modul
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
-const uri = "mongodb+srv://udayganguru2000_db_user:srzkJlTemZdpYXds@cluster0.fzx6hvu.mongodb.net/?appName=Cluster0";
+const uri = "mongodb+srv://<db_user>:<db_password>@cluster0.fzx6hvu.mongodb.net/?appName=Cluster0";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {

@@ -1,9 +1,1 @@
-{
-  "id": "19efb3bf61ccc7ac",
-  "labelIds": [
-    "UNREAD",
-    "TRASH",
-    "CATEGORY_UPDATES"
-  ],
-  "threadId": "19efb3bf61ccc7ac"
-}
+"updated scratchpad successfully." 

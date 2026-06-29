@@ -1,0 +1,14 @@
+current: 
+1) Reading only unread mails, may require to read all mails, can be utilized q option to query any type like from:"",is:unread.
+3)single query working, need to update to multiple combined queries.
+
+Gmail Operations:
+1) Get a list of unread mails.
+2) read unread mails
+3) send mails
+4) trash mail by id.
+5) trash automation.
+6) saves new contacts.
+
+Trash automation:
+get every mail, loop each mail, extract body, categorise(llm decision), move to trash if one of category.
