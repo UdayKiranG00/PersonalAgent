@@ -161,84 +161,84 @@ const categoryToolDeclaration = {
 };
 
 const planningToolDeclaration = {
-functionDeclarations: [
-{
-  "name": "save_scratchpad",
-  "description": "Overwrites the current scratchpad content with a new set of thoughts, approach ideas, or reasoning steps.",
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "content": {
-        "type": "string",
-        "description": "The full text content representing the LLM's current internal thoughts, strategies, and notes."
+  functionDeclarations: [
+    {
+      name: "save_scratchpad",
+      description: "Overwrites the current scratchpad content with a new set of thoughts, approach ideas, or reasoning steps.",
+      parameters: {
+        type: "object",
+        properties: {
+          content: {
+            type: "string",
+            description: "The full text content representing the LLM's current internal thoughts, strategies, and notes."
+          }
+        },
+        required: ["content"]
       }
     },
-    "required": ["content"]
-  },
-},
-{
-  "name": "append_task",
-  "description": "Appends a new task to the task management system with a specified description and status.",
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "id": {
-        "type": "string",
-        "description": "The unique identifier for the task."
-      },
-      "task_description": {
-        "type": "string",
-        "description": "The detailed description of the work to be done."
-      },
-      "status": {
-        "type": "string",
-        "enum": ["pending", "done", "cancelled", "failed"],
-        "description": "The current state of the task."
+    {
+      name: "append_task",
+      description: "Appends a new task to the task management system with a specified description and status.",
+      parameters: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            description: "The unique identifier for the task."
+          },
+          task_description: {
+            type: "string",
+            description: "The detailed description of the work to be done."
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "done", "cancelled", "failed"],
+            description: "The current state of the task."
+          }
+        },
+        required: ["id", "task_description", "status"]
       }
     },
-    "required": ["id", "task_description", "status"]
-  },
-},
-{
-    "name": "update_task",
-    "description": "Updates the details or status of an existing task in the system.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier of the task to update."
+    {
+      name: "update_task",
+      description: "Updates the details or status of an existing task in the system.",
+      parameters: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            description: "The unique identifier of the task to update."
+          },
+          task_description: {
+            type: "string",
+            description: "The updated description of the task."
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "done", "cancelled", "failed"],
+            description: "The updated state of the task."
+          }
         },
-        "task_description": {
-          "type": "string",
-          "description": "The updated description of the task."
+        required: ["id"]
+      }
+    },
+    {
+      name: "read_tasks",
+      description: "Retrieves a list of tasks items, optionally filtered by their current status.",
+      parameters: {
+        type: "object",
+        properties: {
+          status: {
+            type: "string",
+            enum: ["pending", "done", "cancelled", "failed"],
+            description: "Filter tasks by this specific state."
+          }
         },
-        "status": {
-          "type": "string",
-          "enum": ["pending", "done", "cancelled", "failed"],
-          "description": "The updated state of the task."
-        }
-      },
-      "required": ["id"]
-    },
-  },
-{
-    "name": "read_tasks",
-    "description": "Retrieves a list of tasks items, optionally filtered by their current status.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": ["pending", "done", "cancelled", "failed"],
-          "description": "Filter tasks by this specific state."
-        }
-      },
-      "required": []
-    },
-  },
-],
-}
+        required: []
+      }
+    }
+  ]
+};
 
 export {
   gmailToolDeclaration,

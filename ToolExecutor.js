@@ -4,10 +4,8 @@ import { stdin as input, stdout as output } from "node:process";
 import * as cheerio from "cheerio";
 import { generateResponse, categorizerPrompt } from "./model_interface.js";
 import { categoryToolDeclaration } from "./tooldesc.js";
+import { setScratchPad } from "./mongodb_interface.js";
 
-const scratchPad = {
-    content:""
-};
 async function executeCmd(cmd) {
   let cmdResponse = "";
   cmdResponse = await new Promise((resolve) => {
@@ -47,26 +45,30 @@ async function extractMailContent() {
 
 async function executeCommands(toolResObj, cmd, args) {
   cmd = args.command;
-  toolResObj.toolResponse += "command used: " + cmd;
+  toolResObj.toolResponse += "[command used]: " + cmd;
   let response = await executeCmd(cmd);
   await fs.writeFile(filePath, response, "utf-8");
 }
 
 async function readMessageDetails(toolResObj, cmd, args) {
   cmd = `gws gmail users messages get --params "{\\"userId\\": \\"me\\", \\"id\\": \\"${args.id}\\"}"`;
-  output.write("tool command: " + cmd);
-  toolResObj.toolResponse += "command used: " + cmd;
+  output.write("\ntool command: " + cmd);
+  toolResObj.toolResponse += "[command used]: " + cmd;
   cmd = cmd + " >output.txt";
   await executeCmd(cmd);
-  await extractMailContent();
+    try {
+      await extractMailContent();
+    } catch (error) {
+      await executeCmd(`echo ${error} > output.txt`);
+    }
 }
 
 async function listsMessages(toolResObj, cmd, args) {
-  const params = `{ \\"userId\\": \\"${args.userId}\\", \\"q\\": \\"${args.q}\\", \\"maxResults\\": \\"1\\" }`;
+  const params = `{ \\"userId\\": \\"${args.userId}\\", \\"q\\": \\"${args.q}\\", \\"maxResults\\": \\"5\\" }`;
   //command to list unread messages: gws gmail users messages list --params "{\"userId\": \"me\", \"q\": \"is:unread\", \"maxResults\": \"2\", \"pageToken\": \"18101350643833213025\"}"
   cmd = `gws gmail users messages list --params "${params}"`;
-  output.write("tool command: " + cmd);
-  toolResObj.toolResponse += "command used: " + cmd;
+  output.write("\ntool command: " + cmd);
+  toolResObj.toolResponse += "[command used]: " + cmd;
   cmd = cmd + " >output.txt";
   await executeCmd(cmd);
 }
@@ -80,31 +82,31 @@ async function sendMails(toolResObj, cmd, args) {
   mailStr = mailStr + args.mailList[len];
   cmd = `gws gmail +send --to ${mailStr} --subject "${args.subject}" --body "${args.body}" --html`;
   output.write("tool command: " + cmd);
-  toolResObj.toolResponse += "command used: " + cmd;
+  toolResObj.toolResponse += "[command used]: " + cmd;
   cmd = cmd + " >output.txt";
   await executeCmd(cmd);
 }
 
 async function trashGmailMessage(toolResObj, cmd, args) {
   cmd = `gws gmail users messages trash --params "{\\"userId\\":\\"me\\",\\"id\\":\\"${args.id}\\"}"`;
-  output.write("tool command: " + cmd);
-  toolResObj.toolResponse += "command used: " + cmd;
+  output.write("\ntool command: " + cmd);
+  toolResObj.toolResponse += "[command used]: " + cmd;
   cmd = cmd + " >output.txt";
   await executeCmd(cmd);
 }
 
 async function saveContact(toolResObj, cmd, args) {
   cmd = `echo {"name":"${args.name}","mailAddress":"${args.mailAddress}"} >> contacts.txt`;
-  output.write("tool command: " + cmd);
-  toolResObj.toolResponse += "command used: " + cmd;
+  output.write("\ntool command: " + cmd);
+  toolResObj.toolResponse += "[command used]: " + cmd;
   await executeCmd(cmd);
   await executeCmd(`type Nul > output.txt`);
 }
 
 async function readContactsList(toolResObj, cmd, args) {
   cmd = `type contacts.txt`;
-  output.write("tool command: " + cmd);
-  toolResObj.toolResponse += "command used: " + cmd;
+  output.write("\ntool command: " + cmd);
+  toolResObj.toolResponse += "[command used]: " + cmd;
   cmd = cmd + " >output.txt";
   await executeCmd(cmd);
 }
@@ -115,7 +117,6 @@ async function trashAutomation(toolResObj, cmd, args) {
   let filePath = "E:/SampleAgent/output.txt";
   let msgListStr = await fs.readFile(filePath, "utf-8");
   let msgList = JSON.parse(msgListStr).messages;
-  output.write(`\n\nmsgList length: ${msgList.length}`);
   for (let i = 0; i < msgList.length; i++) {
     cmd = `gws gmail users messages get --params "{\\"userId\\": \\"me\\", \\"id\\": \\"${msgList[i].id}\\"}" > output.txt`;
     await executeCmd(cmd);
@@ -143,7 +144,8 @@ async function trashAutomation(toolResObj, cmd, args) {
 }
 
 async function saveScratchPad(toolResObj,cmd,args){
-    scratchPad.content = args.content;
+    output.write(`scratchpad from llm: ${args.content}`);
+    await setScratchPad(args.content);
     await executeCmd(`echo "updated scratchpad successfully." > output.txt`);
 }
 const taskItems = [];
@@ -160,7 +162,7 @@ async function updateTask(toolResObj,cmd,args){
             if(args?.status){item.status = args.status;}
         }
     }
-    await executeCmd(`echo "updated task successfully of id: ${args.id} with ${args.task_description} ${args.status}" > output.txt`);
+    await executeCmd(`echo "updated task successfully of id: ${args.id} to ${args.status}" > output.txt`);
 }
 
 async function readTasks(toolResObj,cmd,args){
@@ -194,7 +196,7 @@ async function executeTool(toolCall) {
     toolResponse: "",
   };
   const { name, args } = toolCall;
-  output.write("tool name: " + name);
+  output.write(`\n[tool call]: ${name}`);
   //calls corresponding functions.
   await toolFnMap.get(name)(toolResObj, cmd, args);
 
@@ -203,4 +205,4 @@ async function executeTool(toolCall) {
   return toolResObj.toolResponse;
 }
 
-export { executeTool, scratchPad };
+export { executeTool };

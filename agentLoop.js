@@ -1,12 +1,13 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import { executeTool, scratchPad } from "./ToolExecutor.js";
+import { executeTool } from "./ToolExecutor.js";
 import {
   generateResponse,
   summariserPrompt,
-  gmailPrompt,
+  gmailPrompt
 } from "./model_interface.js";
 import { gmailToolDeclaration, commandToolDeclaration, planningToolDeclaration } from "./tooldesc.js";
+import { getGmailConfig, getScratchPad, setScratchPad } from "./mongodb_interface.js";
 
 const EXIT = new Set(["/exit", "/quit", "exit", "quit"]);
 function shouldExit(line) {
@@ -15,7 +16,9 @@ function shouldExit(line) {
 
 async function main() {
   const rl = createInterface({ input, output });
-  let toolDeclarations = [gmailToolDeclaration, commandToolDeclaration, planningToolDeclaration];
+  const [gmailToolDefinitions,gmailSystemPrompt] = await getGmailConfig();// use mongodb gmail prompt later for now using application gmail prompt
+  await setScratchPad("");
+  let scratchPad = await getScratchPad();
   let msgHistory = [];
   while (true) {
     //input
@@ -28,32 +31,36 @@ async function main() {
     let modelResponse = await generateResponse(
       msgHistory.toString(),
       gmailPrompt,
-      toolDeclarations,
+      gmailToolDefinitions,
     );
-
+    let count = 1;
     while (modelResponse.functionCalls?.length > 0) {
+    output.write(`\nLength in loop ${count} is: ${modelResponse.functionCalls?.length}`);
       for (let i = 0; i < modelResponse.functionCalls.length; i++) {
-        msgHistory.push("Tool Call: " + modelResponse.functionCalls[i].name);
+        msgHistory.push("[Tool Call]: " + modelResponse.functionCalls[i].name);
         let toolResponse = await executeTool(modelResponse.functionCalls[i]);
-        toolResponse = "Tool Response: " + toolResponse;
-        output.write(`tool response: ${toolResponse}\n`);
+        toolResponse = "[Tool Response]: " + toolResponse;
+        output.write(`\n${toolResponse}\n`);
         msgHistory.push(toolResponse);
       }
       modelResponse = await generateResponse(
-        scratchPad.content+msgHistory.toString(),
+        scratchPad+msgHistory.toString(),
         gmailPrompt,
-        toolDeclarations,
+        gmailToolDefinitions,
       );
-      output.write(`\nscratch pad: ${scratchPad.content}`);
+      scratchPad = await getScratchPad();
+      output.write(`\nscratch pad: ${scratchPad}`);
+      count++;
     }
-    output.write(`final model output: ${modelResponse.text}\n\n`);
-    msgHistory.push(modelResponse.text);
+    output.write(`\nSummarising the data...\n`);
     let chatSummary = await generateResponse(
-      msgHistory.toString(),
-      summariserPrompt,
-      [],
-    );
-    output.write(`chat summary: ${chatSummary.text}`);
+          msgHistory.toString(),
+          summariserPrompt,
+          [],
+        );
+    output.write(`\nfinal model output: ${modelResponse.text}\n`);
+    msgHistory.push(modelResponse.text);
+    //output.write(`\nchat summary: ${chatSummary.text}`);
     msgHistory = [chatSummary.text];
   }
 

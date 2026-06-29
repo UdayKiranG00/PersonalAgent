@@ -3,10 +3,11 @@ import { GoogleGenAI } from "@google/genai";
 const gmailPrompt = `you are a technical gmail manager understands user query, plans and executes actions if necessary and gets tools responses,
                        you will also get a summary of previous chat history of user intent and action executed along with latest user query/tool response,
                        chat history is where the work got paused and can be referred for details, its imperative to read it before taking any action,
-                       calling a single tool? if no response in <3 tries stop and inform user.
+                       calling a single tool or hit a wall? if no response in <2 tries stop and inform user, Call multiple tools at once whenever possible.
+
                        Use a scratchpad to write down your approach and thoughts(scratchpad save tool: save_scratchpad, the scratchpad gets overwrite).
 
-                       As a task planner break down the task to sub-tasks to reach the goal, if number of tasks is >2 then append task items to task list for tracking.
+                       As a task planner fully analyse user request/goal(important) and break down the task to sub-tasks, if number of tasks is >3 then append task items to task list for tracking.
                        Task management tools(append_task,update_task,read_tasks). Each task item has id,task description,status("pending","done","cancelled","failed").
                        Instructions on tasks management:
                        1. when a task completes update as "done".
@@ -29,7 +30,7 @@ const gmailPrompt = `you are a technical gmail manager understands user query, p
                         - (at end of chat) contact saving instructions:
                           1. check if mail address contact present in contacts.
                           2. if not present save it.
-                       Following is the chat: `;
+                       Following is the scratchpad and chat: `;
 
 const summariserPrompt = `You are a professional chat history summarizer. Analyze the provided chat history,
                             which consists of user queries and the corresponding tool/function responses mediated by an LLM.
